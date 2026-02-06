@@ -1,0 +1,49 @@
+---
+- name: Change Windows desktop background
+  hosts: windows
+  gather_facts: no
+  vars:
+    target_wallpaper_path: "C:\\Users\\Public\\Pictures\\wallpaper.png"
+
+  tasks:
+    - name: Ensure wallpaper file exists
+      ansible.windows.win_copy:
+        src:  "{{ playbook_dir }}/files/TcBackground.png"
+        dest: "{{ target_wallpaper_path }}"
+        force: yes
+
+    - name: Ensure wallpaper file exists
+      ansible.windows.win_stat:
+        path: "{{ target_wallpaper_path }}"
+      register: wallpaper_file
+
+    - name: Fail if wallpaper file is missing
+      ansible.builtin.fail:
+        msg: "Wallpaper file not found at {{ target_wallpaper_path }}"
+      when: not wallpaper_file.stat.exists
+
+    - name: Set wallpaper path in registry
+      ansible.windows.win_regedit:
+        path: HKCU:\Control Panel\Desktop
+        name: Wallpaper
+        data: "{{ target_wallpaper_path }}"
+        type: string
+
+    - name: Set wallpaper style (10 = fill)
+      ansible.windows.win_regedit:
+        path: HKCU:\Control Panel\Desktop
+        name: WallpaperStyle
+        data: "10"
+        type: string
+
+    - name: Set wallpaper tile option (0 = No)
+      ansible.windows.win_regedit:
+        path: HKCU:\Control Panel\Desktop
+        name: TileWallpaper
+        data: "0"
+        type: string
+
+    - name: Refresh desktop to apply wallpaper
+      ansible.windows.win_shell: |
+        RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters
+

@@ -7,7 +7,7 @@ Tools for using Ansible with Beckhoff IPCs
 
 
 
-###Windows Host Setup (should be the IPC)
+### Windows Host Setup (should be the IPC)
 Need to startup PSRP and open a firewall port for PSRP. The eastiest thing to do is just turn off the firewall, but IT may not appreciate that.
 
 Setting firewall rule:

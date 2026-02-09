@@ -1,0 +1,17 @@
+- name: upload TwinCAT boot folder and restart TwinCAT
+  hosts: windows
+  gather_facts: no
+
+  vars:
+    src_dir: "./files/"
+    dest_dir: "C:\\ProgramData\\Beckhoff\\TwinCAT\\3.1\\Boot"
+
+  tasks:
+    - name: copy boot folder contents
+      ansible.windows.win_copy:
+        src: "{{ src_dir }}/{{ build }}/"
+        dest: "{{ dest_dir }}"
+        remote_src: no
+
+    - name: restart twincat
+      ansible.windows.win_shell: Restart-TwinCAT -Command Restart -force
